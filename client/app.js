@@ -1,5 +1,6 @@
 const PROTO_PATH = "../events.proto";
 const fs = require('fs');
+const path = require('path');
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 
@@ -11,9 +12,9 @@ let packageDefinition = protoLoader.loadSync(PROTO_PATH, {
 });
 
 const credentials = grpc.credentials.createSsl(
-	fs.readFileSync('../certs/ca.crt'),
-	fs.readFileSync('../certs/client.key'),
-	fs.readFileSync('../certs/client.crt')
+	fs.readFileSync(path.join(__dirname, '../scripts/certs/ca.crt')),
+	fs.readFileSync(path.join(__dirname, '../scripts/certs/client.key')),
+	fs.readFileSync(path.join(__dirname, '../scripts/certs/client.crt'))
 );
 
 const EventService = grpc.loadPackageDefinition(packageDefinition).EventService;

@@ -1,6 +1,6 @@
 const PROTO_PATH = "./events.proto";
 const fs = require('fs');
-
+const path = require('path');
 let grpc = require("@grpc/grpc-js");
 let protoLoader = require("@grpc/proto-loader");
 
@@ -16,9 +16,9 @@ let eventsProto = grpc.loadPackageDefinition(packageDefinition);
 const server = new grpc.Server();
 
 let credentials = grpc.ServerCredentials.createSsl(
-	fs.readFileSync('./certs/ca.crt'), [{
-		cert_chain: fs.readFileSync('./certs/server.crt'),
-		private_key: fs.readFileSync('./certs/server.key')
+	fs.readFileSync(path.join(__dirname, '../scripts/certs/ca.crt')), [{
+		cert_chain: fs.readFileSync(path.join(__dirname, '../scripts/certs/server.crt')),
+		private_key: fs.readFileSync(path.join(__dirname, '../scripts/certs/server.key'))
 	}], true);
 
 const { randomUUID } = require("node:crypto");
