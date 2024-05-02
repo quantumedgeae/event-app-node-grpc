@@ -1,24 +1,29 @@
-const PROTO_PATH = "../events.proto";
-const fs = require('fs');
-const path = require('path');
-const grpc = require("@grpc/grpc-js");
-const protoLoader = require("@grpc/proto-loader");
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { credentials as _credentials, loadPackageDefinition } from "@grpc/grpc-js";
+import { loadSync } from "@grpc/proto-loader";
+import { fileURLToPath } from 'url';
 
-let packageDefinition = protoLoader.loadSync(PROTO_PATH, {
+const PROTO_PATH = "../events.proto";
+
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = dirname(__filename); // get the name of the directory
+
+let packageDefinition = loadSync(PROTO_PATH, {
 	keepCase: true,
 	longs: String,
 	enums: String,
 	arrays: true
 });
 
-const credentials = grpc.credentials.createSsl(
-	fs.readFileSync(path.join(__dirname, '../scripts/certs/ca.crt')),
-	fs.readFileSync(path.join(__dirname, '../scripts/certs/client.key')),
-	fs.readFileSync(path.join(__dirname, '../scripts/certs/client.crt'))
+const credentials = _credentials.createSsl(
+	readFileSync(join(__dirname, '../scripts/certs/ca.crt')),
+	readFileSync(join(__dirname, '../scripts/certs/client.key')),
+	readFileSync(join(__dirname, '../scripts/certs/client.crt'))
 );
 
-const EventService = grpc.loadPackageDefinition(packageDefinition).EventService;
+const EventService = loadPackageDefinition(packageDefinition).EventService;
 //establishing an insecure connection
 //const client = new EventService("127.0.0.1:50051",grpc.credentials.createInsecure());
 const client = new EventService("localhost:50051", credentials);
-module.exports = client;
+export default client;

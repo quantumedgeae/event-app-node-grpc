@@ -2,13 +2,14 @@
   "name": "event-app-node-grpc",
   "version": "1.0.0",
   "description": "A CRUD aplication to demonstrate the use of gRPC with NodeJS",
+  "type": "module",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "generate:certs": "./scripts/generate-certs.sh"
   },
-  "author": "(author name here)",
-  "license": "ISC",
+  "author": "Sohail M. Khan <sohail@quantumedge.ae> (https://quantumedge.ae/about)",
+  "license": "MIT",
   "dependencies": {
     "@grpc/grpc-js": "^1.6.12",
     "@grpc/proto-loader": "^0.6.12",

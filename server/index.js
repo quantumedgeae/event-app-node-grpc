@@ -1,27 +1,32 @@
-const PROTO_PATH = "./events.proto";
-const fs = require('fs');
-const path = require('path');
-let grpc = require("@grpc/grpc-js");
-let protoLoader = require("@grpc/proto-loader");
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { loadPackageDefinition, Server, ServerCredentials, status as _status } from "@grpc/grpc-js";
+import { loadSync } from "@grpc/proto-loader";
+import { fileURLToPath } from 'url';
 
-let packageDefinition = protoLoader.loadSync(PROTO_PATH, {
+const PROTO_PATH = "./events.proto";
+
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = dirname(__filename); // get the name of the directory
+
+let packageDefinition = loadSync(PROTO_PATH, {
 	keepCase: true,
 	longs: String,
 	enums: String,
 	arrays: true
 });
 
-let eventsProto = grpc.loadPackageDefinition(packageDefinition);
+let eventsProto = loadPackageDefinition(packageDefinition);
 
-const server = new grpc.Server();
+const server = new Server();
 
-let credentials = grpc.ServerCredentials.createSsl(
-	fs.readFileSync(path.join(__dirname, '../scripts/certs/ca.crt')), [{
-		cert_chain: fs.readFileSync(path.join(__dirname, '../scripts/certs/server.crt')),
-		private_key: fs.readFileSync(path.join(__dirname, '../scripts/certs/server.key'))
+let credentials = ServerCredentials.createSsl(
+	readFileSync(join(__dirname, '../scripts/certs/ca.crt')), [{
+		cert_chain: readFileSync(join(__dirname, '../scripts/certs/server.crt')),
+		private_key: readFileSync(join(__dirname, '../scripts/certs/server.key'))
 	}], true);
 
-const { randomUUID } = require("node:crypto");
+import { randomUUID } from "node:crypto";
 const events = [
 	{
 		id: "34415c7c-f82d-4e44-88ca-ae2a1aaa92b7",
@@ -37,23 +42,26 @@ const events = [
 server.addService(eventsProto.EventService.service, {
 
 	getAllEvents: (_, callback) => {
+    // console.log("getAllEvents: ", call.request);
 		callback(null, { events });
 	},
 
 	getEvent: (call, callback) => {
+    // console.log("getEvent: ", call.request);
 		let event = events.find(n => n.id == call.request.id);
 
 		if (event) {
 			callback(null, event);
 		} else {
 			callback({
-				code: grpc.status.NOT_FOUND,
+				code: _status.NOT_FOUND,
 				details: "Event Not found"
 			});
 		}
 	},
 
 	createEvent: (call, callback) => {
+    // console.log("createEvent: ", call.request);
 		let event = call.request;
 
 		event.id = randomUUID();
@@ -62,6 +70,7 @@ server.addService(eventsProto.EventService.service, {
 	},
 
 	updateEvent: (call, callback) => {
+    // console.log("updateEvent: ", call.request);
 		let existingEvent = events.find(n => n.id == call.request.id);
 
 		if (existingEvent) {
@@ -74,13 +83,14 @@ server.addService(eventsProto.EventService.service, {
 			callback(null, existingEvent);
 		} else {
 			callback({
-				code: grpc.status.NOT_FOUND,
+				code: _status.NOT_FOUND,
 				details: "Event Not found"
 			});
 		}
 	},
 
 	deleteEvent: (call, callback) => {
+    // console.log("deleteEvent: ", call.request);
 		let existingEventIndex = events.findIndex(
 			n => n.id == call.request.id
 		);
@@ -90,7 +100,7 @@ server.addService(eventsProto.EventService.service, {
 			callback(null, {});
 		} else {
 			callback({
-				code: grpc.status.NOT_FOUND,
+				code: _status.NOT_FOUND,
 				details: "Event Not found"
 			});
 		}

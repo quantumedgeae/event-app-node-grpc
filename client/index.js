@@ -1,9 +1,9 @@
-const client = require("./app");
-
-const express = require("express");
+import express, { json } from "express";
 const app = express();
 app.disable('x-powered-by');
-app.use(express.json());
+app.use(json());
+
+import client from "./app.js";
 
 app.get("/", (req, res) => {
 	client.getAllEvents(null, (err, data) => {
