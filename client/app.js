@@ -10,16 +10,16 @@ const __filename = fileURLToPath(import.meta.url); // get the resolved path to t
 const __dirname = dirname(__filename); // get the name of the directory
 
 let packageDefinition = loadSync(PROTO_PATH, {
-	keepCase: true,
-	longs: String,
-	enums: String,
-	arrays: true
+  keepCase: true,
+  longs: String,
+  enums: String,
+  arrays: true
 });
 
 const credentials = _credentials.createSsl(
-	readFileSync(join(__dirname, '../scripts/certs/ca.crt')),
-	readFileSync(join(__dirname, '../scripts/certs/client.key')),
-	readFileSync(join(__dirname, '../scripts/certs/client.crt'))
+  readFileSync(join(__dirname, '../scripts/certs/ca.crt')),
+  readFileSync(join(__dirname, '../scripts/certs/client.key')),
+  readFileSync(join(__dirname, '../scripts/certs/client.crt'))
 );
 
 const EventService = loadPackageDefinition(packageDefinition).EventService;
